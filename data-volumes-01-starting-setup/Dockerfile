@@ -1,0 +1,20 @@
+FROM node:20-alpine3.17
+
+WORKDIR /app
+
+COPY package.json .
+
+RUN npm install
+
+COPY . .
+
+ARG DEFAULT_PORT=80
+
+ENV PORT $DEFAULT_PORT
+
+EXPOSE $PORT
+
+# for anonymous volumes 
+# VOLUME ["/app/feedback"]
+
+CMD ["npm", "start"]
