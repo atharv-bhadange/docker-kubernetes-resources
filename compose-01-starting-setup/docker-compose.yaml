@@ -1,0 +1,51 @@
+version: "3.8"
+services:
+  mongodb:
+    image: 'mongo'
+    env_file:
+      - ./env/mongo.env
+    volumes:
+      - goals-mongo-data:/data/db
+    # environment:
+      # - MONGO_INITDB_ROOT_USERNAME=your_username
+      # - MONGO_INITDB_ROOT_PASSWORD=your_password
+    container_name: mongodb
+    # not required (compose created own environment for the services in this file)
+    # networks: 
+    #   - networkName
+  backend:
+    # image: 'goals-app-backend' (for prebuilt image)
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      # args:
+      #   - name=value
+    env_file:
+      - ./env/backend.env
+    ports:
+      - '80:80'
+    volumes:
+      - goals-logs:/app/logs
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+    container_name: goals-server
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+    container_name: goals-client
+    
+
+# specify named volumes only (to create and share volumes between different containers)
+volumes:
+  goals-mongo-data: 
+  goals-logs:
