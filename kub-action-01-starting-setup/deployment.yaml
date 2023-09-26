@@ -1,0 +1,34 @@
+# declarative approach
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app-deployment
+spec: # deployment spec
+  replicas: 1
+  selector: # selects the specific pods which should be controlled by the current deployment
+    matchLabels:
+      app: second-app # labels are ANDed
+      tier: one
+    # matchExpressions:
+    #   - {key: tier, operator: In, values: [one, two] } # In, NotIn, Exists, DoesNotExist
+  template:
+    # kind: Pod # default value
+    metadata:
+      labels: 
+        app: second-app # both key and value are given by us
+        tier: one 
+        # key: value # can have multiple labels
+    spec: # spec of single pod
+      containers:
+        - name: second-node-app
+          image: atharvbhadange/kub-first-app:2
+          imagePullPolicy: Always # Always, Never, IfNotPresent
+          livenessProbe: # check if the container is alive
+            httpGet:
+              path: / # path to hit
+              port: 8080 # port on which the container is listening
+            initialDelaySeconds: 5 # wait for 5 seconds before checking
+            periodSeconds: 10 # check every 10 seconds
+        # - name: ...
+        #   image: atharvbhadange/...
+

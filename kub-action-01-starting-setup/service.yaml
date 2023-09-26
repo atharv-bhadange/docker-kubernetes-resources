@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: second-app-service
+spec:
+  selector: # select the pods to be exposed by this service
+    app: second-app # select all the pods with label app: second-app
+                    # basically, we create logical grouping of pods using labels 
+  ports:
+    - protocol: TCP
+      port: 80 # port on which the service is exposed (accessible from outside)
+      targetPort: 8080 # port on which the container is listening
+  type: LoadBalancer
+
+

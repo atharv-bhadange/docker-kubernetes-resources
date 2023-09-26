@@ -1,0 +1,39 @@
+# create service first and then add the new pods to it
+apiVersion: v1
+kind: Service
+metadata:
+  name: second-app-service
+spec:
+  selector: # select the pods to be exposed by this service
+    app: second-app # select all the pods with label app: second-app
+                    # basically, we create logical grouping of pods using labels 
+  ports:
+    - protocol: TCP
+      port: 80 # port on which the service is exposed (accessible from outside)
+      targetPort: 8080 # port on which the container is listening
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: second-app-deployment
+spec: # deployment spec
+  replicas: 1
+  selector: # selects the specific pods which should be controlled by the current deployment
+    matchLabels:
+      app: second-app # labels are ANDed
+      tier: one
+  template:
+    # kind: Pod # default value
+    metadata:
+      labels: 
+        app: second-app # both key and value are given by us
+        tier: one 
+        # key: value # can have multiple labels
+    spec: # spec of single pod
+      containers:
+        - name: second-node-app
+          image: atharvbhadange/kub-first-app:2
+        # - name: ...
+        #   image: atharvbhadange/...
+
