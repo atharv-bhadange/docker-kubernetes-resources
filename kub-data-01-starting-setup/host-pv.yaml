@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: story-pv
+spec:
+  capacity: # overall available storage
+    storage: 1Gi
+  storageClassName: standard
+  volumeMode: Filesystem # type of volume, block or filesystem
+  accessModes: # type of access, ReadWriteOnce, ReadOnlyMany, ReadWriteMany
+    - ReadWriteOnce # can be used by a single node, all pods on that node can use it
+    # - ReadOnlyMany # can be used by multiple nodes, but only for reading 
+    # - ReadWriteMany # can be used by multiple nodes, for reading and writing
+  hostPath:
+    path: /data
+    type: DirectoryOrCreate
+    

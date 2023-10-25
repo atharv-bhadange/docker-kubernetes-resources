@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: story-deployment
+spec: 
+  replicas: 2
+  selector: 
+    matchLabels: 
+      app: story
+  template: 
+    metadata: 
+      labels: 
+        app: story
+    spec:
+      containers: 
+        - name: story
+          image: atharvbhadange/kub-story:3
+          volumeMounts:
+            - name: story-volume # identify which volume to mount
+              mountPath: /app/story # mount the volume to the container
+          env: 
+            - name: STORY_FOLDER
+              # value: 'story'
+              valueFrom:
+                configMapKeyRef:
+                  name: story-config
+                  key: STORY_FOLDER
+      volumes:
+        - name: story-volume 
+          # emptyDir: {} # create an empty volume on the pod
+          # hostPath: # mount a directory from the host to the pods, works only on single node cluster
+          #   path: /data # path on the host
+          #   type: DirectoryOrCreate 
+          persistentVolumeClaim: # use a persistent volume claim
+            claimName: story-pvc # name of the persistent volume claim
+
