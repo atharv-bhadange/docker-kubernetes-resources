@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: users
+  template:
+    metadata:
+      labels:
+        app: users
+    spec:
+      containers:
+        - name: users
+          image: atharvbhadange/kub-network-users:latest
+          env: 
+            - name: AUTH_ADDRESS
+              # value: localhost  # for pod internal communication
+              # value: "10.104.33.155"  # for cluster internal communication
+                                        # or use auth-service name in the code
+              value: "auth-service.default"     # using coreDNS service discovery
+        # - name: auth  # auth on the same pod as users
+        #   image: atharvbhadange/kub-network-auth:latest
+
