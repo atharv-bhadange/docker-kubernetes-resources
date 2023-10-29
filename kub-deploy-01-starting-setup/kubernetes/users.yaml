@@ -17,7 +17,7 @@ spec:
   storageClassName: efs-sc
   csi:
     driver: efs.csi.aws.com
-    volumeHandle: 
+    volumeHandle: fs-0a909a7e78e985c5a
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -73,5 +73,3 @@ spec:
         - name: efs-vol
           persistentVolumeClaim:
             claimName: users-pvc
-
-# change pwd while pushing
