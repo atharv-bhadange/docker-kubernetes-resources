@@ -1,0 +1,77 @@
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: users-pv
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: users-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service
+spec:
+  selector:
+    app: users
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: users
+  template:
+    metadata:
+      labels:
+        app: users
+    spec:
+      containers:
+        - name: users-api
+          image: atharvbhadange/kub-dep-users:latest
+          env:
+            - name: MONGODB_CONNECTION_URI
+              value: ''
+            - name: AUTH_API_ADDRESSS
+              value: 'auth-service.default:3000'
+          volumeMounts:
+            - name: efs-vol
+              mountPath: /app/users
+      volumes:
+        - name: efs-vol
+          persistentVolumeClaim:
+            claimName: users-pvc
+
+# change pwd while pushing
